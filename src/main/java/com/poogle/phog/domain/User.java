@@ -1,15 +1,12 @@
 package com.poogle.phog.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter
 @Getter
-@Builder
 @Entity
 public class User {
 
@@ -21,6 +18,11 @@ public class User {
     private String socialId;
     private String email;
 
-    public User() {
+    @Builder
+    public User(String name, String socialId, String email) {
+        this.name = name;
+        this.socialId = socialId;
+        this.email = email;
     }
+
 }
