@@ -5,13 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Setter
-@ToString
 @Getter
 @Builder
 @Entity
@@ -19,12 +15,12 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "USER_ID")
     private Long id;
     private String name;
     private String socialId;
     private String email;
 
-    protected User() {
-
+    public User() {
     }
 }
