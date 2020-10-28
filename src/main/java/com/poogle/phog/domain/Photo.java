@@ -1,7 +1,13 @@
 package com.poogle.phog.domain;
 
+import lombok.Builder;
+import lombok.Setter;
+import lombok.ToString;
+
 import javax.persistence.*;
 
+@ToString
+@Setter
 @Entity
 public class Photo {
 
@@ -16,10 +22,9 @@ public class Photo {
     @JoinColumn(name = "NOTE_ID")
     private Note note;
 
-    //연관관계 편의 메소드
-    public void addPhoto(Note note) {
-        this.note = note;
-        note.getPhotos().add(this);
+    @Builder
+    public Photo(String url) {
+        this.url = url;
     }
 
     public Photo() {
