@@ -1,16 +1,16 @@
 package com.poogle.phog.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Builder
 @Entity
 public class Note {
 
@@ -22,12 +22,12 @@ public class Note {
     private Boolean isDeleted;
 
     @Lob
-    private String rawMemoTag;
+    private String rawMemo;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
 
-    @OneToMany(mappedBy = "note")
+    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Photo> photos = new ArrayList<>();
 
     @ManyToOne
@@ -37,7 +37,20 @@ public class Note {
     @OneToMany(mappedBy = "note")
     private List<NoteHasTag> noteHasTags = new ArrayList<>();
 
-    public Note() {
+    @Builder
+    public Note(Boolean isDeleted, String rawMemo, LocalDateTime created, List<Photo> photos) {
+        this.isDeleted = isDeleted;
+        this.rawMemo = rawMemo;
+        this.created = created;
+        this.photos = photos;
     }
 
+    public void addPhotos(List<Photo> photos) {
+        this.photos = photos;
+        if (this.photos != null && this.photos.size() > 0) {
+            for (Photo photo : photos) {
+                photo.setNote(this);
+            }
+        }
+    }
 }
