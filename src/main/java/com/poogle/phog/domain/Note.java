@@ -36,7 +36,7 @@ public class Note {
     private User user;
 
     @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<NoteHasTag> noteHasTags = new ArrayList<>();
+    private List<NoteTag> noteTags = new ArrayList<>();
 
     @Builder
     public Note(User user, Boolean isDeleted, String rawMemo, LocalDateTime created, List<Photo> photos) {
