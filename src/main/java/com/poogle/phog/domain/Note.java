@@ -7,6 +7,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,7 +23,6 @@ public class Note {
 
     private Boolean isDeleted;
 
-    @Lob
     private String rawMemo;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -34,11 +35,12 @@ public class Note {
     @JoinColumn(name = "USER_ID")
     private User user;
 
-    @OneToMany(mappedBy = "note")
+    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<NoteHasTag> noteHasTags = new ArrayList<>();
 
     @Builder
-    public Note(Boolean isDeleted, String rawMemo, LocalDateTime created, List<Photo> photos) {
+    public Note(User user, Boolean isDeleted, String rawMemo, LocalDateTime created, List<Photo> photos) {
+        this.user = user;
         this.isDeleted = isDeleted;
         this.rawMemo = rawMemo;
         this.created = created;
@@ -52,5 +54,16 @@ public class Note {
                 photo.setNote(this);
             }
         }
+    }
+
+    public List<String> captureTags(Note note) {
+        String memo = note.getRawMemo();
+        Pattern pattern = Pattern.compile("#[A-z가-힣]*");
+        Matcher matcher = pattern.matcher(memo);
+        List<String> tags = new ArrayList<>();
+        while (matcher.find()) {
+            tags.add(matcher.group().trim().replace("#", ""));
+        }
+        return tags;
     }
 }
