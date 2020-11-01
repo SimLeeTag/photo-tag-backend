@@ -13,6 +13,10 @@ import java.util.List;
 public class Tag {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "TAG_ID")
+    private Long tagId;
+
     @Column(name = "TAG_NAME")
     private String tagName;
 

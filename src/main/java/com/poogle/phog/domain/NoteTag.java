@@ -17,7 +17,7 @@ public class NoteTag {
     private Note note;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "TAG_NAME")
+    @JoinColumn(name = "TAG_ID")
     private Tag tag;
 
     @Builder
