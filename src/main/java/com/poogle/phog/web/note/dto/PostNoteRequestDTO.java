@@ -13,6 +13,7 @@ import java.util.List;
 public class PostNoteRequestDTO {
     private String rawMemo;
     private List<Photo> photos;
+    private Long userId;
 
     public PostNoteRequestDTO(String rawMemo, List<Photo> photos) {
         this.rawMemo = rawMemo;
