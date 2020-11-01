@@ -25,6 +25,7 @@ public class NoteService {
         this.userRepository = userRepository;
     }
 
+    //TODO: userId 추가
     @Transactional
     public void save(PostNoteRequestDTO noteRequestDTO) {
         LocalDateTime now = LocalDateTime.now();
@@ -33,24 +34,28 @@ public class NoteService {
             throw new VerificationException("Note can't be blank");
         }
 
-        //TODO: user 추가
         Note note = Note.builder()
+                .user(userRepository.findUserById(noteRequestDTO.getUserId()))
                 .rawMemo(noteRequestDTO.getRawMemo())
                 .created(now)
                 .isDeleted(false)
                 .build();
         note.addPhotos(noteRequestDTO.getPhotos());
 
+        //TODO: Apple Login 반영 후 header로 변경해야 함
+        Long userId = noteRequestDTO.getUserId();
+
         List<String> tags = note.captureTags(note);
         log.debug("[*] tags : {}", tags.toString());
 
-        //TODO: userId 추가
+        Optional<Tag> optionalTag = tagRepository.findTagByUserIdAndTagNameIn(userId, tags);
+
         for (String tagName : tags) {
-            Optional<Tag> optionalTag = tagRepository.findTagByTagName(tagName);
             Tag tag = optionalTag.orElseGet(() ->
                     Tag.builder()
                             .tagName(tagName)
                             .activated(true)
+                            .userId(userId)
                             .build()
             );
             NoteTag noteTag = NoteTag.builder()
