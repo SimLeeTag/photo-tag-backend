@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -45,19 +44,23 @@ public class NoteService {
         //TODO: Apple Login 반영 후 header로 변경해야 함
         Long userId = noteRequestDTO.getUserId();
 
-        List<String> tags = note.captureTags(note);
-        log.debug("[*] tags : {}", tags.toString());
+        List<String> usedTags = note.captureTags(note);
+        log.debug("[*] usedTags : {}", usedTags.toString());
+        List<Tag> dbTags = tagRepository.findTagsByUserIdAndTagNameIn(userId, usedTags);
+        log.debug("[*] dbTags : {}", dbTags.toString());
 
-        Optional<Tag> optionalTag = tagRepository.findTagByUserIdAndTagNameIn(userId, tags);
 
-        for (String tagName : tags) {
-            Tag tag = optionalTag.orElseGet(() ->
-                    Tag.builder()
-                            .tagName(tagName)
-                            .activated(true)
-                            .userId(userId)
-                            .build()
-            );
+        for (String tagName : usedTags) {
+            Tag tag;
+            if (dbTags.contains(tagRepository.findTagByUserIdAndTagName(userId, tagName))) {
+                tag = tagRepository.findTagByUserIdAndTagName(userId, tagName);
+            } else {
+                tag = Tag.builder()
+                        .tagName(tagName)
+                        .activated(true)
+                        .userId(userId)
+                        .build();
+            }
             NoteTag noteTag = NoteTag.builder()
                     .tag(tag)
                     .note(note)
