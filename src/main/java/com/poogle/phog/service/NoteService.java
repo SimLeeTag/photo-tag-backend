@@ -4,10 +4,12 @@ import com.poogle.phog.domain.*;
 import com.poogle.phog.exception.VerificationException;
 import com.poogle.phog.web.note.dto.PostNoteRequestDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -20,11 +22,13 @@ public class NoteService {
     private NoteRepository noteRepository;
     private TagRepository tagRepository;
     private UserRepository userRepository;
+    private NoteTagService noteTagService;
 
-    public NoteService(NoteRepository noteRepository, TagRepository tagRepository, UserRepository userRepository) {
+    public NoteService(NoteRepository noteRepository, TagRepository tagRepository, UserRepository userRepository, NoteTagService noteTagService) {
         this.noteRepository = noteRepository;
         this.tagRepository = tagRepository;
         this.userRepository = userRepository;
+        this.noteTagService = noteTagService;
     }
 
     //TODO: userId 추가
@@ -72,5 +76,20 @@ public class NoteService {
             note.getNoteTags().add(noteTag);
         }
         noteRepository.save(note);
+    }
+
+    public Note findNote(Long noteId) throws NotFound {
+        return noteRepository.findById(noteId).orElseThrow(NotFound::new);
+    }
+
+    public List<String> findPhotos(Long noteId) throws NotFound {
+        Note note = findNote(noteId);
+        List<Photo> photos = note.getPhotos();
+        List<String> photoUrls = new ArrayList<>();
+        for (Photo photo : photos) {
+            photoUrls.add(photo.getUrl());
+        }
+        log.debug("[*] photoUrls : {}", photoUrls);
+        return photoUrls;
     }
 }
