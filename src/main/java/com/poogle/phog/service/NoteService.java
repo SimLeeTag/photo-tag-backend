@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,14 +49,15 @@ public class NoteService {
 
         List<String> usedTags = note.captureTags(note);
         log.debug("[*] usedTags : {}", usedTags.toString());
-        List<Tag> dbTags = tagRepository.findTagsByUserIdAndTagNameIn(userId, usedTags);
+        Map<String, Tag> dbTags = tagRepository.findTagsByUserIdAndTagNameIn(userId, usedTags)
+                .stream()
+                .collect(Collectors.toMap(Tag::getTagName, Function.identity()));
         log.debug("[*] dbTags : {}", dbTags.toString());
-
 
         for (String tagName : usedTags) {
             Tag tag;
-            if (dbTags.contains(tagRepository.findTagByUserIdAndTagName(userId, tagName))) {
-                tag = tagRepository.findTagByUserIdAndTagName(userId, tagName);
+            if (dbTags.containsKey(tagName)) {
+                tag = dbTags.get(tagName);
             } else {
                 tag = Tag.builder()
                         .tagName(tagName)
