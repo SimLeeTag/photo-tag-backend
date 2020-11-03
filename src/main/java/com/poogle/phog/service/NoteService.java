@@ -92,4 +92,14 @@ public class NoteService {
         log.debug("[*] photoUrls : {}", photoUrls);
         return photoUrls;
     }
+
+    public List<String> findTags(Long noteId) {
+        List<Tag> tags = noteTagService.findTagsByNoteId(noteId);
+        List<String> tagNames = new ArrayList<>();
+        for (Tag tag : tags) {
+            tagNames.add(tag.getTagName());
+        }
+        log.debug("[*] tagList : {}", tagNames);
+        return tagNames;
+    }
 }
