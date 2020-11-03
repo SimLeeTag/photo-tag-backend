@@ -45,9 +45,9 @@ public class JwtService {
     }
 
     public User parseAppleJwt(Map<String, Object> payloads) {
-        String socialId = (String) payloads.get("socialId");
-        String name = (String) payloads.get("name");
+        String socialId = (String) payloads.get("sub");
         String email = (String) payloads.get("email");
+        String name = email.substring(0, email.indexOf("@"));
         return User.builder()
                 .name(name)
                 .socialId(socialId)
