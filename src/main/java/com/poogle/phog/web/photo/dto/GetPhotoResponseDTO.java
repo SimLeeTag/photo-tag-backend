@@ -8,6 +8,5 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 public class GetPhotoResponseDTO {
-    private Long photoId;
     private String url;
 }
