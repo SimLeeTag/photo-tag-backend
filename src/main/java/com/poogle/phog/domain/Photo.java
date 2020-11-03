@@ -1,13 +1,15 @@
 package com.poogle.phog.domain;
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
 
-@ToString
 @Setter
+@Getter
+@ToString
 @Entity
 public class Photo {
 
