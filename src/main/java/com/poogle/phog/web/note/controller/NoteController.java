@@ -1,6 +1,8 @@
 package com.poogle.phog.web.note.controller;
 
+import com.poogle.phog.domain.Note;
 import com.poogle.phog.service.NoteService;
+import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
 import com.poogle.phog.web.note.dto.PostNoteRequestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
@@ -23,8 +25,22 @@ public class NoteController {
     //TODO: `@RequestAttribute`로 userId 추가
     @PostMapping("")
     public void create(@RequestBody PostNoteRequestDTO request,
-                       HttpServletResponse response) throws NotFound {
+                       HttpServletResponse response) {
         noteService.save(request);
         response.setStatus(HttpStatus.CREATED.value());
+    }
+
+    @GetMapping("/{note-id}")
+    public GetNoteResponseDTO detail(@PathVariable(name = "note-id") Long noteId) throws NotFound {
+        Note note = noteService.findNote(noteId);
+
+        GetNoteResponseDTO detail = GetNoteResponseDTO.builder()
+                .noteId(noteId)
+                .rawMemo(note.getRawMemo())
+                .photos(noteService.findPhotos(noteId))
+                .created(note.getCreated())
+                .tags(noteService.findTags(noteId))
+                .build();
+        return detail;
     }
 }
