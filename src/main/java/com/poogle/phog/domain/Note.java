@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Setter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
