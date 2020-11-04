@@ -3,6 +3,7 @@ package com.poogle.phog.service;
 import com.poogle.phog.domain.*;
 import com.poogle.phog.exception.VerificationException;
 import com.poogle.phog.web.note.dto.PostNoteRequestDTO;
+import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -21,12 +23,14 @@ public class NoteService {
 
     private NoteRepository noteRepository;
     private TagRepository tagRepository;
+    private NoteTagRepository noteTagRepository;
     private UserRepository userRepository;
     private NoteTagService noteTagService;
 
-    public NoteService(NoteRepository noteRepository, TagRepository tagRepository, UserRepository userRepository, NoteTagService noteTagService) {
+    public NoteService(NoteRepository noteRepository, TagRepository tagRepository, NoteTagRepository noteTagRepository, UserRepository userRepository, NoteTagService noteTagService) {
         this.noteRepository = noteRepository;
         this.tagRepository = tagRepository;
+        this.noteTagRepository = noteTagRepository;
         this.userRepository = userRepository;
         this.noteTagService = noteTagService;
     }
@@ -51,14 +55,14 @@ public class NoteService {
         //TODO: Apple Login 반영 후 header로 변경해야 함
         Long userId = noteRequestDTO.getUserId();
 
-        List<String> usedTags = note.captureTags(note);
-        log.debug("[*] usedTags : {}", usedTags.toString());
-        Map<String, Tag> dbTags = tagRepository.findTagsByUserIdAndTagNameIn(userId, usedTags)
+        List<String> newTags = note.captureTags(note);
+        log.debug("[*] newTags : {}", newTags.toString());
+        Map<String, Tag> dbTags = tagRepository.findTagsByUserIdAndTagNameIn(userId, newTags)
                 .stream()
                 .collect(Collectors.toMap(Tag::getTagName, Function.identity()));
         log.debug("[*] dbTags : {}", dbTags.toString());
 
-        for (String tagName : usedTags) {
+        for (String tagName : newTags) {
             Tag tag;
             if (dbTags.containsKey(tagName)) {
                 tag = dbTags.get(tagName);
@@ -101,5 +105,46 @@ public class NoteService {
         }
         log.debug("[*] tagList : {}", tagNames);
         return tagNames;
+    }
+
+    public void edit(Long noteId, PostNoteRequestDTO noteDTO) throws NotFoundException {
+        LocalDateTime now = LocalDateTime.now();
+        if (noteDTO.getRawMemo() == null) {
+            throw new VerificationException("Note can't be blank");
+        }
+        Long userId = noteDTO.getUserId();
+
+        Note note = noteRepository.findById(noteId).orElseThrow(() -> new NotFoundException("Note doesn't exist"));
+
+        note.setCreated(now);
+        note.setRawMemo(noteDTO.getRawMemo());
+
+        noteTagService.deleteByNoteId(noteId);
+
+        List<String> newTags = note.captureTags(note);
+
+        Map<String, Tag> dbTags = tagRepository.findTagsByUserIdAndTagNameIn(userId, newTags)
+                .stream()
+                .collect(Collectors.toMap(Tag::getTagName, Function.identity()));
+        log.debug("[*] dbTags: {}", dbTags.toString());
+
+        for (String tagName : newTags) {
+            Tag tag;
+            if (dbTags.containsKey(tagName)) {
+                tag = dbTags.get(tagName);
+            } else {
+                tag = Tag.builder()
+                        .tagName(tagName)
+                        .activated(true)
+                        .userId(userId)
+                        .build();
+            }
+            NoteTag noteTag = NoteTag.builder()
+                    .tag(tag)
+                    .note(note)
+                    .build();
+            note.getNoteTags().add(noteTag);
+        }
+        noteRepository.save(note);
     }
 }
