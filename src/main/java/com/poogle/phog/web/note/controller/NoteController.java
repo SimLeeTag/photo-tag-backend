@@ -25,14 +25,15 @@ public class NoteController {
 
     //TODO: `@RequestAttribute`로 userId 추가
     @PostMapping("")
-    public void create(@RequestBody PostNoteRequestDTO request,
+    public void create(@RequestBody PostNoteRequestDTO request, @RequestAttribute("id") Long userId,
                        HttpServletResponse response) {
-        noteService.save(request);
+        noteService.save(request, userId);
         response.setStatus(HttpStatus.CREATED.value());
     }
 
     @GetMapping("/{note-id}")
-    public GetNoteResponseDTO detail(@PathVariable(name = "note-id") Long noteId) throws NotFound {
+    public GetNoteResponseDTO detail(@PathVariable(name = "note-id") Long noteId,
+                                     @RequestAttribute("id") Long userId) throws NotFound {
         Note note = noteService.findNote(noteId);
 
         GetNoteResponseDTO detail = GetNoteResponseDTO.builder()
@@ -47,8 +48,8 @@ public class NoteController {
 
     @PutMapping("/{note-id}")
     public void edit(@PathVariable(name = "note-id") Long noteId, @RequestBody PostNoteRequestDTO request,
-                     HttpServletResponse response) throws NotFoundException {
-        noteService.edit(noteId, request);
+                     @RequestAttribute("id") Long userId, HttpServletResponse response) throws NotFoundException {
+        noteService.edit(userId, noteId, request);
         response.setStatus(HttpStatus.OK.value());
     }
 

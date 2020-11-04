@@ -37,7 +37,7 @@ public class NoteService {
 
     //TODO: userId 추가
     @Transactional
-    public void save(PostNoteRequestDTO noteRequestDTO) {
+    public void save(PostNoteRequestDTO noteRequestDTO, Long userId) {
         LocalDateTime now = LocalDateTime.now();
 
         if (noteRequestDTO.getRawMemo() == null || noteRequestDTO.getPhotos() == null) {
@@ -45,7 +45,7 @@ public class NoteService {
         }
 
         Note note = Note.builder()
-                .user(userRepository.findUserById(noteRequestDTO.getUserId()))
+                .user(userRepository.findUserById(userId))
                 .rawMemo(noteRequestDTO.getRawMemo())
                 .created(now)
                 .isDeleted(false)
@@ -53,7 +53,6 @@ public class NoteService {
         note.addPhotos(noteRequestDTO.getPhotos());
 
         //TODO: Apple Login 반영 후 header로 변경해야 함
-        Long userId = noteRequestDTO.getUserId();
 
         List<String> newTags = note.captureTags(note);
         log.debug("[*] newTags : {}", newTags.toString());
@@ -107,12 +106,11 @@ public class NoteService {
         return tagNames;
     }
 
-    public void edit(Long noteId, PostNoteRequestDTO noteDTO) throws NotFoundException {
+    public void edit(Long userId, Long noteId, PostNoteRequestDTO noteDTO) throws NotFoundException {
         LocalDateTime now = LocalDateTime.now();
         if (noteDTO.getRawMemo() == null) {
             throw new VerificationException("Note can't be blank");
         }
-        Long userId = noteDTO.getUserId();
 
         Note note = noteRepository.findById(noteId).orElseThrow(() -> new NotFoundException("Note doesn't exist"));
 
