@@ -1,30 +1,28 @@
 package com.poogle.phog.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter
-@ToString
 @Getter
-@Builder
 @Entity
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "USER_ID")
     private Long id;
     private String name;
     private String socialId;
     private String email;
 
-    protected User() {
-
+    @Builder
+    public User(String name, String socialId, String email) {
+        this.name = name;
+        this.socialId = socialId;
+        this.email = email;
     }
+
 }
