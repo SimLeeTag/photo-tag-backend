@@ -147,4 +147,8 @@ public class NoteService {
         }
         noteRepository.save(note);
     }
+
+    public void delete(Long noteId) {
+        noteRepository.deleteById(noteId);
+    }
 }
