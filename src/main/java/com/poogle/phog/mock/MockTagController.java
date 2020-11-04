@@ -2,12 +2,10 @@ package com.poogle.phog.mock;
 
 import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
 import com.poogle.phog.web.photo.dto.GetPhotoResponseDTO;
+import com.poogle.phog.web.tag.dto.GetTagCategoryResponseDTO;
 import com.poogle.phog.web.tag.dto.GetTagListResponseDTO;
 import com.poogle.phog.web.tag.dto.GetTagSuggestionDTO;
-import com.poogle.phog.web.tag.dto.GetTagCategoryResponseDTO;
 import com.poogle.phog.web.tag.dto.PatchTagRequestDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +16,6 @@ import java.util.List;
 @RequestMapping("/mock/tags")
 @RestController
 public class MockTagController {
-    private static final Logger log = LoggerFactory.getLogger(MockNoteController.class);
 
     @GetMapping("/setting")
     public List<GetTagListResponseDTO> tagList() {
@@ -130,29 +127,21 @@ public class MockTagController {
         }
         notes.add(GetNoteResponseDTO.builder()
                 .noteId(1L)
-                .rawMemoTag("Let's run with Nike. #달리기 힘들다. #ootd #shopping")
-                .created("2020-10-19 14:24:35")
                 .photos(photoList)
                 .tags(tagList)
                 .build());
         notes.add(GetNoteResponseDTO.builder()
                 .noteId(2L)
-                .rawMemoTag("두번째 테스트")
-                .created("2020-10-19 14:24:35")
                 .photos(photoList)
                 .tags(tagList)
                 .build());
         notes.add(GetNoteResponseDTO.builder()
                 .noteId(3L)
-                .rawMemoTag("세번째 테스트")
-                .created("2020-10-19 14:24:35")
                 .photos(photoList)
                 .tags(tagList)
                 .build());
         notes.add(GetNoteResponseDTO.builder()
                 .noteId(4L)
-                .rawMemoTag("네번째 테스트")
-                .created("2020-10-19 14:24:35")
                 .photos(photoList)
                 .tags(tagList)
                 .build());
@@ -176,7 +165,6 @@ public class MockTagController {
     public void activate(@PathVariable(name = "tagId") long tagId,
                          @RequestBody PatchTagRequestDTO request,
                          HttpServletResponse response) {
-        log.debug("[*] patch - tagId : {}, request : {}", tagId, request);
         response.setStatus(HttpStatus.OK.value());
     }
 }
