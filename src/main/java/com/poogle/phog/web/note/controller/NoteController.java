@@ -51,4 +51,11 @@ public class NoteController {
         noteService.edit(noteId, request);
         response.setStatus(HttpStatus.OK.value());
     }
+
+    @DeleteMapping("/{note-id}")
+    public void delete(@PathVariable(name = "note-id") Long noteId,
+                       HttpServletResponse response) {
+        noteService.delete(noteId);
+        response.setStatus(HttpStatus.OK.value());
+    }
 }
