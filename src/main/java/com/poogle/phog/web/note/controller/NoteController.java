@@ -23,7 +23,6 @@ public class NoteController {
         this.noteService = noteService;
     }
 
-    //TODO: `@RequestAttribute`로 userId 추가
     @PostMapping("")
     public void create(@RequestBody PostNoteRequestDTO request, @RequestAttribute("id") Long userId,
                        HttpServletResponse response) {
