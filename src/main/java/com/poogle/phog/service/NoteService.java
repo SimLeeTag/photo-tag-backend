@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -23,19 +22,16 @@ public class NoteService {
 
     private NoteRepository noteRepository;
     private TagRepository tagRepository;
-    private NoteTagRepository noteTagRepository;
     private UserRepository userRepository;
     private NoteTagService noteTagService;
 
-    public NoteService(NoteRepository noteRepository, TagRepository tagRepository, NoteTagRepository noteTagRepository, UserRepository userRepository, NoteTagService noteTagService) {
+    public NoteService(NoteRepository noteRepository, TagRepository tagRepository, UserRepository userRepository, NoteTagService noteTagService) {
         this.noteRepository = noteRepository;
         this.tagRepository = tagRepository;
-        this.noteTagRepository = noteTagRepository;
         this.userRepository = userRepository;
         this.noteTagService = noteTagService;
     }
 
-    //TODO: userId 추가
     @Transactional
     public void save(PostNoteRequestDTO noteRequestDTO, Long userId) {
         LocalDateTime now = LocalDateTime.now();
@@ -52,8 +48,6 @@ public class NoteService {
                 .build();
         note.addPhotos(noteRequestDTO.getPhotos());
 
-        //TODO: Apple Login 반영 후 header로 변경해야 함
-
         List<String> newTags = note.captureTags(note);
         log.debug("[*] newTags : {}", newTags.toString());
         Map<String, Tag> dbTags = tagRepository.findTagsByUserIdAndTagNameIn(userId, newTags)
@@ -61,6 +55,10 @@ public class NoteService {
                 .collect(Collectors.toMap(Tag::getTagName, Function.identity()));
         log.debug("[*] dbTags : {}", dbTags.toString());
 
+        checkRemainTag(userId, note, newTags, dbTags);
+    }
+
+    private void checkRemainTag(Long userId, Note note, List<String> newTags, Map<String, Tag> dbTags) {
         for (String tagName : newTags) {
             Tag tag;
             if (dbTags.containsKey(tagName)) {
@@ -126,24 +124,7 @@ public class NoteService {
                 .collect(Collectors.toMap(Tag::getTagName, Function.identity()));
         log.debug("[*] dbTags: {}", dbTags.toString());
 
-        for (String tagName : newTags) {
-            Tag tag;
-            if (dbTags.containsKey(tagName)) {
-                tag = dbTags.get(tagName);
-            } else {
-                tag = Tag.builder()
-                        .tagName(tagName)
-                        .activated(true)
-                        .userId(userId)
-                        .build();
-            }
-            NoteTag noteTag = NoteTag.builder()
-                    .tag(tag)
-                    .note(note)
-                    .build();
-            note.getNoteTags().add(noteTag);
-        }
-        noteRepository.save(note);
+        checkRemainTag(userId, note, newTags, dbTags);
     }
 
     public void delete(Long noteId) {
