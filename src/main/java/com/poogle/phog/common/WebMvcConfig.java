@@ -28,6 +28,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(authCheckInterceptor())
                 .addPathPatterns("/**")
                 .excludePathPatterns("/apple-login")
-                .excludePathPatterns("/mock/**");
+                .excludePathPatterns("/mock/**")
+                .excludePathPatterns("/swagger-ui.html")
+                .excludePathPatterns("/swagger-resources/**")
+                .excludePathPatterns("/v2/api-docs")
+                .excludePathPatterns("/webjars/**");
     }
 }
