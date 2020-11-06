@@ -7,9 +7,9 @@ import lombok.*;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class GetTagListResponseDTO {
+public class TagListDTO {
     private Long tagId;
     private String tagName;
     private Integer frequency;
