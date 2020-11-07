@@ -4,12 +4,16 @@ import com.poogle.phog.domain.NoteTagRepository;
 import com.poogle.phog.domain.Tag;
 import com.poogle.phog.domain.TagRepository;
 import com.poogle.phog.web.tag.dto.GetTagListResponseDTO;
+import com.poogle.phog.web.tag.dto.PatchTagRequestDTO;
 import com.poogle.phog.web.tag.dto.TagListDTO;
+import lombok.extern.slf4j.Slf4j;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class TagService {
 
@@ -46,5 +50,11 @@ public class TagService {
                 .activatedList(getActivatedTags)
                 .archivedList(getArchivedTags)
                 .build();
+    }
+
+    public void changeActiveStatus(Long tagId, PatchTagRequestDTO request) throws NotFound {
+        Tag tag = tagRepository.findById(tagId).orElseThrow(NotFound::new);
+        tag.setActivated(request.getActivated());
+        tagRepository.save(tag);
     }
 }
