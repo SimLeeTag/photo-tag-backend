@@ -3,15 +3,20 @@ package com.poogle.phog.web.tag.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
+import java.util.List;
+
 @ToString
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 public class GetTagListResponseDTO {
-    private Long tagId;
-    private String tagName;
-    private Integer frequency;
-    private Boolean activated;
+
+    private List<TagListDTO> activatedList;
+    private List<TagListDTO> archivedList;
+
+    @Builder
+    public GetTagListResponseDTO(List<TagListDTO> activatedList, List<TagListDTO> archivedList) {
+        this.activatedList = activatedList;
+        this.archivedList = archivedList;
+    }
 }

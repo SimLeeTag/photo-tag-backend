@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
 @ToString(exclude = "noteTags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter

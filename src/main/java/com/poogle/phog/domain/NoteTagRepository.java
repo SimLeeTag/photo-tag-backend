@@ -14,4 +14,7 @@ public interface NoteTagRepository extends JpaRepository<NoteTag, Long> {
 
     @SQLDelete(sql = "DELETE FROM note_tag WHERE note_id = :id")
     void deleteByNoteId(@Param("id") Long noteId);
+
+    @Query(value = "SELECT COUNT (note_tag_id) FROM NoteTag WHERE tag_id = :id")
+    int countNoteTagByTagId(@Param("id") Long tagId);
 }
