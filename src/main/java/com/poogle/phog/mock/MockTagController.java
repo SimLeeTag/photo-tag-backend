@@ -3,7 +3,7 @@ package com.poogle.phog.mock;
 import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
 import com.poogle.phog.web.photo.dto.GetPhotoResponseDTO;
 import com.poogle.phog.web.tag.dto.GetTagCategoryResponseDTO;
-import com.poogle.phog.web.tag.dto.GetTagListResponseDTO;
+import com.poogle.phog.web.tag.dto.TagListDTO;
 import com.poogle.phog.web.tag.dto.GetTagSuggestionDTO;
 import com.poogle.phog.web.tag.dto.PatchTagRequestDTO;
 import org.springframework.http.HttpStatus;
@@ -16,42 +16,6 @@ import java.util.List;
 @RequestMapping("/mock/tags")
 @RestController
 public class MockTagController {
-
-    @GetMapping("/setting")
-    public List<GetTagListResponseDTO> tagList() {
-        List<GetTagListResponseDTO> getTagListResponseDTOList = new ArrayList<>();
-        getTagListResponseDTOList.add(GetTagListResponseDTO.builder()
-                .tagId(3L)
-                .tagName("#ootd")
-                .frequency(4)
-                .activated(true)
-                .build());
-        getTagListResponseDTOList.add(GetTagListResponseDTO.builder()
-                .tagId(2L)
-                .tagName("#shopping")
-                .frequency(6)
-                .activated(true)
-                .build());
-        getTagListResponseDTOList.add(GetTagListResponseDTO.builder()
-                .tagId(5L)
-                .tagName("#달리기")
-                .frequency(6)
-                .activated(true)
-                .build());
-        getTagListResponseDTOList.add(GetTagListResponseDTO.builder()
-                .tagId(1L)
-                .tagName("#abc")
-                .frequency(2)
-                .activated(false)
-                .build());
-        getTagListResponseDTOList.add(GetTagListResponseDTO.builder()
-                .tagId(4L)
-                .tagName("#오늘")
-                .frequency(1)
-                .activated(false)
-                .build());
-        return getTagListResponseDTOList;
-    }
 
     @GetMapping("/explore")
     public List<GetTagCategoryResponseDTO> tagCategoryList(
@@ -111,18 +75,18 @@ public class MockTagController {
             photoList.add(photo.getUrl());
         }
 
-        List<GetTagListResponseDTO> tags = new ArrayList<>();
-        tags.add(GetTagListResponseDTO.builder()
+        List<TagListDTO> tags = new ArrayList<>();
+        tags.add(TagListDTO.builder()
                 .tagName("#달리기")
                 .build());
-        tags.add(GetTagListResponseDTO.builder()
+        tags.add(TagListDTO.builder()
                 .tagName("#ootd")
                 .build());
-        tags.add(GetTagListResponseDTO.builder()
+        tags.add(TagListDTO.builder()
                 .tagName("#shopping")
                 .build());
         List<String> tagList = new ArrayList<>();
-        for (GetTagListResponseDTO tag : tags) {
+        for (TagListDTO tag : tags) {
             tagList.add(tag.getTagName());
         }
         notes.add(GetNoteResponseDTO.builder()
@@ -159,12 +123,5 @@ public class MockTagController {
         return GetTagSuggestionDTO.builder()
                 .suggestion(recommendList)
                 .build();
-    }
-
-    @PatchMapping("/{tagId}")
-    public void activate(@PathVariable(name = "tagId") long tagId,
-                         @RequestBody PatchTagRequestDTO request,
-                         HttpServletResponse response) {
-        response.setStatus(HttpStatus.OK.value());
     }
 }
