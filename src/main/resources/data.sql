@@ -3,8 +3,6 @@ VALUES ("poogle@mail.com", "poogle", 123456);
 INSERT INTO user (email, name, social_id)
 VALUES ("suhyun@mail.com", "suhyun", 654987);
 INSERT INTO user (email, name, social_id)
-VALUES ("popo@popo.com", "popo", 11111);
-INSERT INTO user (email, name, social_id)
 VALUES ("lena@lena.com", "lena", 1442341);
 
 INSERT INTO tag (tag_name, activated, user_id)
