@@ -41,7 +41,8 @@
 <br/>
 
 ## 📝ERD
-![Screenshot from 2020-10-18 22-26-03](https://user-images.githubusercontent.com/58318786/96368802-18446e00-1191-11eb-9760-804c95eed7f2.png)
+![erd2](https://user-images.githubusercontent.com/58318786/99186112-5aad9a80-2791-11eb-8b8a-a7cba72f1531.png)
+
 
 <br/>
 
