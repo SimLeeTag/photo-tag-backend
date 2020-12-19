@@ -2,60 +2,20 @@ package com.poogle.phog.mock;
 
 import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
 import com.poogle.phog.web.photo.dto.GetPhotoResponseDTO;
-import com.poogle.phog.web.tag.dto.GetTagCategoryResponseDTO;
-import com.poogle.phog.web.tag.dto.TagListDTO;
 import com.poogle.phog.web.tag.dto.GetTagSuggestionDTO;
-import com.poogle.phog.web.tag.dto.PatchTagRequestDTO;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import com.poogle.phog.web.tag.dto.TagListDTO;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/mock/tags")
 @RestController
 public class MockTagController {
-
-    @GetMapping("/explore")
-    public List<GetTagCategoryResponseDTO> tagCategoryList(
-            @RequestParam(value = "limit", defaultValue = "12") int limit,
-            @RequestParam(value = "offset", defaultValue = "0") int offset) {
-        List<GetTagCategoryResponseDTO> getTagCategoryResponseDTOList = new ArrayList<>();
-        List<GetPhotoResponseDTO> photos = new ArrayList<>();
-        photos.add(GetPhotoResponseDTO.builder()
-                .url("sdfsdsdfsdfsdfsdfsdfsdfsdgdfgfsdf")
-                .build());
-        photos.add(GetPhotoResponseDTO.builder()
-                .url("asdafghfghfghfhgwerwerwerwerwsdf")
-                .build());
-        photos.add(GetPhotoResponseDTO.builder()
-                .url("werrtyytrywerwerwerwerwerwerwqweqfdgfghjkdfvghjrt")
-                .build());
-        getTagCategoryResponseDTOList.add(GetTagCategoryResponseDTO.builder()
-                .tagId(3L)
-                .tagName("#ootd")
-                .frequency(4)
-                .activated(true)
-                .thumbnail(photos.get(1).getUrl())
-                .build());
-        getTagCategoryResponseDTOList.add(GetTagCategoryResponseDTO.builder()
-                .tagId(2L)
-                .tagName("#shopping")
-                .frequency(6)
-                .activated(true)
-                .thumbnail(photos.get(1).getUrl())
-                .build());
-        getTagCategoryResponseDTOList.add(GetTagCategoryResponseDTO.builder()
-                .tagId(5L)
-                .tagName("#달리기")
-                .frequency(6)
-                .activated(true)
-                .thumbnail(photos.get(1).getUrl())
-                .build());
-        return getTagCategoryResponseDTOList;
-    }
-
+    
     @GetMapping("")
     public List<GetNoteResponseDTO> taggedNotes(
             @RequestParam(value = "tag", defaultValue = "1") int tagId) {
