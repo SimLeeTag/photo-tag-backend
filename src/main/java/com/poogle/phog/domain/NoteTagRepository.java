@@ -17,4 +17,8 @@ public interface NoteTagRepository extends JpaRepository<NoteTag, Long> {
 
     @Query(value = "SELECT COUNT (note_tag_id) FROM NoteTag WHERE tag_id = :id")
     int countNoteTagByTagId(@Param("id") Long tagId);
+
+    @Query(value = "SELECT MAX(note_id) FROM note_tag WHERE tag_id = :id", nativeQuery=true)
+    Long findRecentNoteIdByTagId(@Param("id") Long tagId);
+
 }
