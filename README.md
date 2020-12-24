@@ -8,8 +8,8 @@
 ~~description~~
 [Team Repository]()
 
-![release](https://img.shields.io/github/v/release/SimLeeTag/photo-tag-backend?color=5833C1)
-![last commit](https://img.shields.io/github/last-commit/SimLeeTag/photo-tag-backend)
+[![Build Status](https://travis-ci.com/SimLeeTag/photo-tag-backend.svg?branch=deploy)](https://travis-ci.com/SimLeeTag/photo-tag-backend)
+![last commit](https://img.shields.io/github/last-commit/SimLeeTag/photo-tag-backend?color=5833C1)
 ![most language](https://img.shields.io/github/languages/top/SimLeeTag/photo-tag-backend)
 
 <br/>
