@@ -36,7 +36,7 @@
 <br/>
 
 ## 🚀CI/CD
-
+![CI/CD](https://user-images.githubusercontent.com/58318786/103171592-dc184280-4890-11eb-9a5d-cf062ef18742.jpg)
 
 <br/>
 
