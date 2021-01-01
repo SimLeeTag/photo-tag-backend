@@ -1,6 +1,7 @@
 package com.poogle.phog.web.tag.controller;
 
 import com.poogle.phog.service.TagService;
+import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
 import com.poogle.phog.web.tag.dto.GetTagCategoryResponseDTO;
 import com.poogle.phog.web.tag.dto.GetTagListResponseDTO;
 import com.poogle.phog.web.tag.dto.PatchTagRequestDTO;
@@ -41,5 +42,11 @@ public class TagController {
     public List<GetTagCategoryResponseDTO> categorize(
             @RequestAttribute("id") Long userId, final Pageable pageable) {
         return tagService.tagCategoryResponseDTOList(userId, pageable);
+    }
+
+    @GetMapping("")
+    public List<GetNoteResponseDTO> taggedNotes(
+            @RequestParam(value = "tag", required = true) List<Long> tags) throws NotFound {
+        return tagService.getTaggedNoteList(tags);
     }
 }
