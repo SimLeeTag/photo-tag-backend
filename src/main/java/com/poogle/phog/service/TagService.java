@@ -1,6 +1,7 @@
 package com.poogle.phog.service;
 
 import com.poogle.phog.domain.*;
+import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
 import com.poogle.phog.web.tag.dto.GetTagCategoryResponseDTO;
 import com.poogle.phog.web.tag.dto.GetTagListResponseDTO;
 import com.poogle.phog.web.tag.dto.PatchTagRequestDTO;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -21,11 +24,13 @@ public class TagService {
     private TagRepository tagRepository;
     private NoteTagRepository noteTagRepository;
     private NoteRepository noteRepository;
+    private NoteService noteService;
 
-    public TagService(TagRepository tagRepository, NoteTagRepository noteTagRepository, NoteRepository noteRepository) {
+    public TagService(TagRepository tagRepository, NoteTagRepository noteTagRepository, NoteRepository noteRepository, NoteService noteService) {
         this.tagRepository = tagRepository;
         this.noteTagRepository = noteTagRepository;
         this.noteRepository = noteRepository;
+        this.noteService = noteService;
     }
 
     public GetTagListResponseDTO tagResponseDTOList(Long userId) {
@@ -76,5 +81,32 @@ public class TagService {
             getCategorizedTags.add(getTagCategoryResponseDTO);
         }
         return getCategorizedTags;
+    }
+
+    public List<GetNoteResponseDTO> getTaggedNoteList(List<Long> tags) throws NotFound {
+        List<Long> taggedNoteIds = new ArrayList<>();
+        for (Long tagId : tags) {
+            List<Long> noteIdList = noteTagRepository.findNoteIdsByTagId(tagId);
+            for (Long noteId : noteIdList) {
+                if (!taggedNoteIds.contains(noteId)) {
+                    taggedNoteIds.add(noteId);
+                }
+            }
+        }
+        taggedNoteIds.sort(Comparator.reverseOrder());
+        List<GetNoteResponseDTO> taggedNotes = new ArrayList<>();
+        for (Long noteId : taggedNoteIds) {
+            Note note = noteService.findNote(noteId);
+            GetNoteResponseDTO detail = GetNoteResponseDTO.builder()
+                    .noteId(noteId)
+                    .rawMemo(note.getRawMemo())
+                    .photos(noteService.findPhotos(noteId))
+                    .created(note.getCreated())
+                    .tags(noteService.findTags(noteId))
+                    .build();
+            taggedNotes.add(detail);
+        }
+        Collections.sort(taggedNotes);
+        return taggedNotes;
     }
 }
