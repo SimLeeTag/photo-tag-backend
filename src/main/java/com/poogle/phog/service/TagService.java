@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -93,7 +92,6 @@ public class TagService {
                 }
             }
         }
-        taggedNoteIds.sort(Comparator.reverseOrder());
         List<GetNoteResponseDTO> taggedNotes = new ArrayList<>();
         for (Long noteId : taggedNoteIds) {
             Note note = noteService.findNote(noteId);
