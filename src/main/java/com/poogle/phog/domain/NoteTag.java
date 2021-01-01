@@ -1,10 +1,12 @@
 package com.poogle.phog.domain;
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.ToString;
 
 import javax.persistence.*;
 
+@Getter
 @ToString(exclude = {"note", "tag"})
 @Entity
 public class NoteTag {
