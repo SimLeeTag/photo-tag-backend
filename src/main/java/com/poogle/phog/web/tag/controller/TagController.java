@@ -4,14 +4,19 @@ import com.poogle.phog.service.TagService;
 import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
 import com.poogle.phog.web.tag.dto.GetTagCategoryResponseDTO;
 import com.poogle.phog.web.tag.dto.GetTagListResponseDTO;
+import com.poogle.phog.web.tag.dto.GetTagSuggestionDTO;
 import com.poogle.phog.web.tag.dto.PatchTagRequestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Slf4j
@@ -48,5 +53,10 @@ public class TagController {
     public List<GetNoteResponseDTO> taggedNotes(
             @RequestParam(value = "tag", required = true) List<Long> tags) throws NotFound {
         return tagService.getTaggedNoteList(tags);
+    }
+
+    @GetMapping(value = "/suggestion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public GetTagSuggestionDTO suggest(@RequestPart("file") MultipartFile multipartFile) throws IOException, URISyntaxException {
+        return tagService.suggestTags(multipartFile);
     }
 }
