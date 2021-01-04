@@ -179,6 +179,7 @@ public class TagService {
         HashMap<String, StringBuffer> apiResult = new HashMap<>();
         apiResult.put("responseCode", statusCode);
         apiResult.put("response", response);
+        log.info("[*] apiResult: {}", apiResult);
         return apiResult;
     }
 
@@ -188,7 +189,7 @@ public class TagService {
         ArrayList<String> tagsEn = new ArrayList<>();
         ArrayList<String> tagsKr = new ArrayList<>();
 
-        log.debug("[*] suggestions : {}", suggestions);
+        log.info("[*] suggestions : {}", suggestions);
 
         if (suggestions.get("responseCode").toString().equals("200")) {
             JSONObject result = new JSONObject(suggestions.get("response").toString()).getJSONObject("result");
