@@ -14,11 +14,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -121,4 +122,65 @@ public class TagService {
         Collections.sort(taggedNotes);
         return taggedNotes;
     }
+
+    private Map<String, StringBuffer> requestTags(MultipartFile multipartFile) throws IOException {
+        String HEADER = "KakaoAK " + MYAPP_KEY;
+        String CRLF = "\r\n";
+        String TWO_HYPHENS = "--";
+        String BOUNDARY = UUID.randomUUID().toString();
+        URL apiURL = new URL(API_URL);
+        String fileName = multipartFile.getName();
+
+        HttpURLConnection connection = (HttpURLConnection) apiURL.openConnection();
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        connection.setUseCaches(false);
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Authorization", HEADER);
+        connection.setRequestProperty("Connection", "Keep-Alive");
+        connection.setRequestProperty("Content-Type", "multipart/form-data;charset=utf-8;boundary=" + BOUNDARY);
+
+        OutputStream outputStream = connection.getOutputStream();
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true);
+        writer.append(TWO_HYPHENS).append(BOUNDARY).append(CRLF);
+        writer.append("Content-Disposition: form-data; name=\"image\"; filename=\"").append(fileName).append("\"").append(CRLF);
+        writer.append("Content-Type: ").append(URLConnection.guessContentTypeFromName(fileName)).append(CRLF);
+        writer.append("Content-Transfer-Encoding: binary").append(CRLF);
+        writer.append(CRLF);
+        writer.flush();
+
+        File file = multipartToFile(multipartFile, fileName);
+        FileInputStream inputStream = new FileInputStream(file);
+        byte[] buffer = new byte[4096];
+        int bytesRead = -1;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
+        }
+        outputStream.flush();
+        inputStream.close();
+        writer.append(CRLF);
+        writer.flush();
+
+        int responseCode = connection.getResponseCode();
+        BufferedReader br;
+        if (responseCode == 200) {
+            br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+        } else {
+            br = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8));
+        }
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = br.readLine()) != null) {
+            response.append(inputLine);
+        }
+        br.close();
+        StringBuffer statusCode = new StringBuffer();
+        statusCode.append(responseCode);
+
+        HashMap<String, StringBuffer> apiResult = new HashMap<>();
+        apiResult.put("responseCode", statusCode);
+        apiResult.put("response", response);
+        return apiResult;
+    }
+
 }
