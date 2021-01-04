@@ -8,10 +8,14 @@ import com.poogle.phog.web.tag.dto.PatchTagRequestDTO;
 import com.poogle.phog.web.tag.dto.TagListDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,16 +24,26 @@ import java.util.List;
 @Service
 public class TagService {
 
+    private final String API_URL = "https://dapi.kakao.com/v2/vision/multitag/generate";
+    private final String MYAPP_KEY;
     private TagRepository tagRepository;
     private NoteTagRepository noteTagRepository;
     private NoteRepository noteRepository;
     private NoteService noteService;
 
-    public TagService(TagRepository tagRepository, NoteTagRepository noteTagRepository, NoteRepository noteRepository, NoteService noteService) {
+    public TagService(TagRepository tagRepository, NoteTagRepository noteTagRepository, NoteRepository noteRepository,
+                      NoteService noteService, Environment env) {
         this.tagRepository = tagRepository;
         this.noteTagRepository = noteTagRepository;
         this.noteRepository = noteRepository;
         this.noteService = noteService;
+        MYAPP_KEY = env.getProperty("MYAPP_KEY");
+    }
+
+    private static File multipartToFile(MultipartFile multipart, String fileName) throws IllegalStateException, IOException {
+        File file = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
+        multipart.transferTo(file);
+        return file;
     }
 
     public GetTagListResponseDTO tagResponseDTOList(Long userId) {
