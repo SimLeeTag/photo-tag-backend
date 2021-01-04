@@ -2,11 +2,10 @@ package com.poogle.phog.service;
 
 import com.poogle.phog.domain.*;
 import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
-import com.poogle.phog.web.tag.dto.GetTagCategoryResponseDTO;
-import com.poogle.phog.web.tag.dto.GetTagListResponseDTO;
-import com.poogle.phog.web.tag.dto.PatchTagRequestDTO;
-import com.poogle.phog.web.tag.dto.TagListDTO;
+import com.poogle.phog.web.tag.dto.*;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
@@ -181,6 +180,30 @@ public class TagService {
         apiResult.put("responseCode", statusCode);
         apiResult.put("response", response);
         return apiResult;
+    }
+
+    public GetTagSuggestionDTO suggestTags(MultipartFile multipartFile) throws IOException {
+        Map<String, StringBuffer> suggestions = requestTags(multipartFile);
+        GetTagSuggestionDTO getTagSuggestionDTO;
+        ArrayList<String> tagsEn = new ArrayList<>();
+        ArrayList<String> tagsKr = new ArrayList<>();
+
+        log.debug("[*] suggestions : {}", suggestions);
+
+        if (suggestions.get("responseCode").toString().equals("200")) {
+            JSONObject result = new JSONObject(suggestions.get("response").toString()).getJSONObject("result");
+            JSONArray labelEn = result.getJSONArray("label");
+            JSONArray labelKr = result.getJSONArray("label_kr");
+            for (int i = 0; i < labelKr.length(); i++) {
+                tagsEn.add((String) labelEn.get(i));
+                tagsKr.add((String) labelKr.get(i));
+            }
+        }
+        getTagSuggestionDTO = GetTagSuggestionDTO.builder()
+                .tagsEn(tagsEn)
+                .tagsKr(tagsKr)
+                .build();
+        return getTagSuggestionDTO;
     }
 
 }
