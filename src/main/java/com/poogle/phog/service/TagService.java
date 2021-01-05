@@ -129,6 +129,7 @@ public class TagService {
         String BOUNDARY = UUID.randomUUID().toString();
         URL apiURL = new URL(API_URL);
         String fileName = multipartFile.getName();
+        log.info("[*] MYAPP_KEY: {}", MYAPP_KEY);
 
         HttpURLConnection connection = (HttpURLConnection) apiURL.openConnection();
         connection.setDoInput(true);
