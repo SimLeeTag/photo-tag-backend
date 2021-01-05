@@ -25,7 +25,7 @@ import java.util.*;
 public class TagService {
 
     private final String API_URL = "https://dapi.kakao.com/v2/vision/multitag/generate";
-    private final String MYAPP_KEY;
+    private final String KAKAO;
     private TagRepository tagRepository;
     private NoteTagRepository noteTagRepository;
     private NoteRepository noteRepository;
@@ -37,7 +37,7 @@ public class TagService {
         this.noteTagRepository = noteTagRepository;
         this.noteRepository = noteRepository;
         this.noteService = noteService;
-        MYAPP_KEY = env.getProperty("MYAPP_KEY");
+        KAKAO = env.getProperty("MYAPP_KEY");
     }
 
     private static File multipartToFile(MultipartFile multipart, String fileName) throws IllegalStateException, IOException {
@@ -123,13 +123,13 @@ public class TagService {
     }
 
     private Map<String, StringBuffer> requestTags(MultipartFile multipartFile) throws IOException {
-        String HEADER = "KakaoAK " + MYAPP_KEY;
+        String HEADER = "KakaoAK " + KAKAO;
         String CRLF = "\r\n";
         String TWO_HYPHENS = "--";
         String BOUNDARY = UUID.randomUUID().toString();
         URL apiURL = new URL(API_URL);
         String fileName = multipartFile.getName();
-        log.info("[*] MYAPP_KEY: {}", MYAPP_KEY);
+        log.info("[*] MYAPP_KEY: {}", KAKAO);
 
         HttpURLConnection connection = (HttpURLConnection) apiURL.openConnection();
         connection.setDoInput(true);
