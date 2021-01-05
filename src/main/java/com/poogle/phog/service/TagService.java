@@ -37,7 +37,7 @@ public class TagService {
         this.noteTagRepository = noteTagRepository;
         this.noteRepository = noteRepository;
         this.noteService = noteService;
-        KAKAO = env.getProperty("MYAPP_KEY");
+        KAKAO = env.getProperty("KAKAO");
     }
 
     private static File multipartToFile(MultipartFile multipart, String fileName) throws IllegalStateException, IOException {
@@ -129,7 +129,7 @@ public class TagService {
         String BOUNDARY = UUID.randomUUID().toString();
         URL apiURL = new URL(API_URL);
         String fileName = multipartFile.getName();
-        log.info("[*] MYAPP_KEY: {}", KAKAO);
+        log.info("[*] KAKAO: {}", KAKAO);
 
         HttpURLConnection connection = (HttpURLConnection) apiURL.openConnection();
         connection.setDoInput(true);
