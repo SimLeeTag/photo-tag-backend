@@ -45,6 +45,5 @@ deploy:
     application: photo-tag-backend #등록한 CodeDeploy 애플리케이션
     deployment_group: photo-tag-backend-group
     region: ap-northeast-2
-    wait-until-deployed: true
     on:
       all_branches: true
