@@ -1,28 +1,3 @@
-#version: 0.0
-#os: linux
-#files:
-#  - source: /
-#    destination: /home/ec2-user/app/photo-tag-backend/zip/
-#    overwrite: yes
-#
-#permissions:
-#  - object: /
-#    pattern: "**"
-#    owner: ec2-user
-#    group: ec2-user
-#
-#hooks:
-#  AfterInstall:
-#    - location: scripts/stop.sh #NGINX와 연결되어 있지 않은 스프링 부트를 종료
-#      timeout: 60
-#      runas: ec2-user
-#  ApplicationStart:
-#    - location: scripts/start.sh #NGINX와 연결되어 있지 않은 Port로 새 버전의 스프링 부트를 시작
-#      timeout: 60
-#      runas: ec2-user
-#  ValidateService:
-#    - location: scripts/health.sh # 새 스프링 부트가 정상적으로 실행됐는지 확인
-
 
 version: 0.0
 os: linux
