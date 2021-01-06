@@ -22,7 +22,7 @@ notifications:
 
 before_deploy:
   - mkdir -p before-deploy
-  - cp scripts/deploy.sh before-deploy/
+  - cp deploy.sh before-deploy/
   - cp appspec.yml before-deploy/
   - cp build/libs/*.jar before-deploy/
   - cd before-deploy && zip -r before-deploy *
