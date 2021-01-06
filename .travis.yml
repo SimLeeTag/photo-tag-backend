@@ -21,9 +21,13 @@ notifications:
       - pcn021152@gmail.com
 
 before_deploy:
-  - zip -r photo-tag-backend *
-  - mkdir -p deploy
-  - mv photo-tag-backend.zip deploy/photo-tag-backend.zip
+  - mkdir -p before-deploy
+  - cp scripts/deploy.sh before-deploy/
+  - cp appspec.yml before-deploy/
+  - cp build/libs/*.jar before-deploy/
+  - cd before-deploy && zip -r before-deploy *
+  - cd ../ && mkdir -p deploy
+  - mv before-deploy/before-deploy.zip deploy/photo-tag-backend.zip
 
 deploy:
   - provider: s3
@@ -33,6 +37,7 @@ deploy:
     region: ap-northeast-2
     acl: private #zip 파일 접근을 private으로
     local_dir: deploy
+    wait-until-deployed: true
     on:
       all_branches: true
 
@@ -45,5 +50,6 @@ deploy:
     application: photo-tag-backend #등록한 CodeDeploy 애플리케이션
     deployment_group: photo-tag-backend-group
     region: ap-northeast-2
+    wait-until-deployed: true
     on:
       all_branches: true
