@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
-import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,19 +24,18 @@ import java.util.*;
 public class TagService {
 
     private final String API_URL = "https://dapi.kakao.com/v2/vision/multitag/generate";
-    private final String KAKAO;
+    private final String KAKAO = System.getenv("KAKAO");
     private TagRepository tagRepository;
     private NoteTagRepository noteTagRepository;
     private NoteRepository noteRepository;
     private NoteService noteService;
 
     public TagService(TagRepository tagRepository, NoteTagRepository noteTagRepository, NoteRepository noteRepository,
-                      NoteService noteService, Environment env) {
+                      NoteService noteService) {
         this.tagRepository = tagRepository;
         this.noteTagRepository = noteTagRepository;
         this.noteRepository = noteRepository;
         this.noteService = noteService;
-        KAKAO = env.getProperty("KAKAO");
     }
 
     private static File multipartToFile(MultipartFile multipart, String fileName) throws IllegalStateException, IOException {
