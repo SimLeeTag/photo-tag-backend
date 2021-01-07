@@ -17,7 +17,6 @@ public class JwtService {
 
     private final String APPLE_KEY;
     private final String APPLE_ID;
-    private final String TEST = System.getenv("TEST");
 
     public JwtService(Environment env) {
         APPLE_KEY = env.getProperty("APPLE_KEY");
@@ -44,7 +43,6 @@ public class JwtService {
         String registeredKey = (String) payloads.get("iss");
         //APPLE_ID
         String account = (String) payloads.get("aud");
-        log.info("[*] test: {}", TEST);
         return (registeredKey.equals(APPLE_KEY) && account.equals(APPLE_ID));
     }
 
