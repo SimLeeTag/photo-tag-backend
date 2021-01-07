@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,13 +30,16 @@ public class TagService {
     private NoteTagRepository noteTagRepository;
     private NoteRepository noteRepository;
     private NoteService noteService;
+    private final String TEST;
+
 
     public TagService(TagRepository tagRepository, NoteTagRepository noteTagRepository, NoteRepository noteRepository,
-                      NoteService noteService) {
+                      NoteService noteService, Environment env) {
         this.tagRepository = tagRepository;
         this.noteTagRepository = noteTagRepository;
         this.noteRepository = noteRepository;
         this.noteService = noteService;
+        TEST = env.getProperty("TEST");
     }
 
     private static File multipartToFile(MultipartFile multipart, String fileName) throws IllegalStateException, IOException {
@@ -128,6 +132,7 @@ public class TagService {
         URL apiURL = new URL(API_URL);
         String fileName = multipartFile.getName();
         log.info("[*] KAKAO: {}", KAKAO);
+        log.info("[*] TEST: {}", TEST);
 
         HttpURLConnection connection = (HttpURLConnection) apiURL.openConnection();
         connection.setDoInput(true);
