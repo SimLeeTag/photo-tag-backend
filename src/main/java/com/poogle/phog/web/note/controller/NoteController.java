@@ -80,4 +80,10 @@ public class NoteController {
         noteService.delete(noteId);
         response.setStatus(HttpStatus.OK.value());
     }
+
+    @GetMapping("/search")
+    public List<GetNoteResponseDTO> search(@RequestAttribute("id") Long userId,
+                                           @RequestParam(value = "word", required = true) String word) throws NotFound {
+        return noteService.findAllNotes(userId, word);
+    }
 }
