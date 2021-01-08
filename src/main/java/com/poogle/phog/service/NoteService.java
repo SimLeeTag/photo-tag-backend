@@ -2,6 +2,7 @@ package com.poogle.phog.service;
 
 import com.poogle.phog.domain.*;
 import com.poogle.phog.exception.VerificationException;
+import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
 import com.poogle.phog.web.note.dto.PostNoteRequestDTO;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +82,25 @@ public class NoteService {
 
     public Note findNote(Long noteId) throws NotFound {
         return noteRepository.findById(noteId).orElseThrow(NotFound::new);
+    }
+
+    public List<GetNoteResponseDTO> findAllNotes(Long userId, String word) throws NotFound {
+        List<GetNoteResponseDTO> searchedNotes = new ArrayList<>();
+        User user = userRepository.findUserById(userId);
+        List<Note> notes = noteRepository.findNotesByUserAndRawMemoContainsOrderByCreatedDesc(user, word);
+        for (Note note : notes) {
+            Long noteId = note.getId();
+            GetNoteResponseDTO searchedNote = GetNoteResponseDTO.builder()
+                    .noteId(noteId)
+                    .tags(findTags(noteId))
+                    .created(note.getCreated())
+                    .rawMemo(note.getRawMemo())
+                    .photos(findPhotos(noteId))
+                    .build();
+            searchedNotes.add(searchedNote);
+        }
+        return searchedNotes;
+
     }
 
     public List<String> findPhotos(Long noteId) throws NotFound {
