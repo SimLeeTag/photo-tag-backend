@@ -12,4 +12,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 
     @Query(value = "SELECT url FROM Photo WHERE note_id = :id")
     List<Photo> findPhotoByNoteId(@Param("id") Long noteId);
+
+    List<Note> findNotesByUserAndRawMemoContainsOrderByCreatedDesc(User user, String word);
+
 }
