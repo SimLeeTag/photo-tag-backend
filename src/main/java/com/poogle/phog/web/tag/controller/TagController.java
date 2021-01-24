@@ -38,8 +38,9 @@ public class TagController {
     @PatchMapping("/{tag-id}")
     public void activate(@PathVariable(name = "tag-id") Long tagId,
                          @RequestBody PatchTagRequestDTO request,
+                         @RequestAttribute("id") Long userId,
                          HttpServletResponse response) throws NotFound {
-        tagService.changeActiveStatus(tagId, request);
+        tagService.changeActiveStatus(userId, tagId, request);
         response.setStatus(HttpStatus.OK.value());
     }
 
