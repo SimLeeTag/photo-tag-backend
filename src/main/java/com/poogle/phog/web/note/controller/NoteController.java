@@ -2,14 +2,14 @@ package com.poogle.phog.web.note.controller;
 
 import com.poogle.phog.domain.Note;
 import com.poogle.phog.domain.Photo;
+import com.poogle.phog.exception.AuthorizationException;
 import com.poogle.phog.exception.VerificationException;
+import com.poogle.phog.exception.NotFoundException;
 import com.poogle.phog.service.NoteService;
 import com.poogle.phog.service.S3Service;
 import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
 import com.poogle.phog.web.note.dto.PostNoteRequestDTO;
-import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -64,17 +64,22 @@ public class NoteController {
 
     @GetMapping("/{note-id}")
     public GetNoteResponseDTO detail(@PathVariable(name = "note-id") Long noteId,
-                                     @RequestAttribute("id") Long userId) throws NotFound {
+                                     @RequestAttribute("id") Long userId) throws NotFoundException {
         Note note = noteService.findNote(noteId);
-
-        GetNoteResponseDTO detail = GetNoteResponseDTO.builder()
-                .noteId(noteId)
-                .rawMemo(note.getRawMemo())
-                .photos(noteService.findPhotos(noteId))
-                .created(note.getCreated())
-                .tags(noteService.findTags(noteId))
-                .build();
-        return detail;
+        if (note == null) {
+            throw NotFoundException.noteNotFound();
+        }
+        if (!userId.equals(note.getUser().getId())) {
+            throw AuthorizationException.accessWrong();
+        } else {
+            return GetNoteResponseDTO.builder()
+                    .noteId(noteId)
+                    .rawMemo(note.getRawMemo())
+                    .photos(noteService.findPhotos(noteId))
+                    .created(note.getCreated())
+                    .tags(noteService.findTags(noteId))
+                    .build();
+        }
     }
 
     @PutMapping("/{note-id}")
@@ -93,7 +98,7 @@ public class NoteController {
 
     @GetMapping("/search")
     public List<GetNoteResponseDTO> search(@RequestAttribute("id") Long userId,
-                                           @RequestParam(value = "word", required = true) String word) throws NotFound {
+                                           @RequestParam(value = "word") String word) throws NotFoundException {
         return noteService.findAllNotes(userId, word);
     }
 }
