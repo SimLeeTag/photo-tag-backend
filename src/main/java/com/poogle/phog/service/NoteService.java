@@ -50,6 +50,9 @@ public class NoteService {
         note.addPhotos(noteRequestDTO.getPhotos());
 
         List<String> newTags = note.captureTags(note);
+        if (newTags.isEmpty()) {
+            throw new VerificationException("There should be at least one tag");
+        }
         log.debug("[*] newTags : {}", newTags.toString());
         Map<String, Tag> dbTags = tagRepository.findTagsByUserIdAndTagNameIn(userId, newTags)
                 .stream()
