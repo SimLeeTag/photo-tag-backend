@@ -2,6 +2,7 @@ package com.poogle.phog.web.note.controller;
 
 import com.poogle.phog.domain.Note;
 import com.poogle.phog.domain.Photo;
+import com.poogle.phog.exception.VerificationException;
 import com.poogle.phog.service.NoteService;
 import com.poogle.phog.service.S3Service;
 import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
@@ -36,19 +37,28 @@ public class NoteController {
     public void create(@RequestPart("file") List<MultipartFile> multipartFiles,
                        @RequestPart("request") PostNoteRequestDTO request,
                        @RequestAttribute("id") Long userId,
-                       HttpServletResponse response) throws IOException {
+                       HttpServletResponse response) throws IOException, VerificationException {
+        log.debug("photos:{}", multipartFiles);
 
         List<Photo> urls = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
-            String url = s3Service.upload(multipartFile, "public");
-            Photo photo = Photo.builder()
-                    .url(url)
-                    .build();
-            urls.add(photo);
+            if (!multipartFile.isEmpty()) {
+                String url = s3Service.upload(multipartFile, "public");
+                Photo photo = Photo.builder()
+                        .url(url)
+                        .build();
+                urls.add(photo);
+            } else {
+                throw new VerificationException("Photos can't be blank");
+            }
         }
 
         request.setPhotos(urls);
-        noteService.save(request, userId);
+        if (!request.getRawMemo().isEmpty()) {
+            noteService.save(request, userId);
+        } else {
+            throw new VerificationException("Note can't be blank");
+        }
         response.setStatus(HttpStatus.CREATED.value());
     }
 
