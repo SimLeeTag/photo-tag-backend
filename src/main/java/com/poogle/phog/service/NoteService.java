@@ -113,7 +113,7 @@ public class NoteService {
     public List<String> findPhotos(Long noteId) throws NotFoundException {
         Note note = findNote(noteId);
         List<Photo> photos = note.getPhotos();
-        if (!photos.isEmpty()) {
+        if (photos.isEmpty()) {
             throw new NotFoundException("Photos don't exist");
         }
         List<String> photoUrls = new ArrayList<>();
@@ -144,13 +144,17 @@ public class NoteService {
             throw new VerificationException("Note can't be blank");
         }
         Note note = noteRepository.findById(noteId).orElseThrow(() -> new NotFoundException("Note doesn't exist"));
-
+        if (!note.getUser().getId().equals(userId)) {
+            throw AuthorizationException.accessWrong();
+        }
         note.setCreated(now);
         note.setRawMemo(noteDTO.getRawMemo());
-
         noteTagService.deleteByNoteId(noteId);
 
         List<String> newTags = note.captureTags(note);
+        if (newTags.isEmpty()) {
+            throw new VerificationException("There should be at least one tag");
+        }
 
         Map<String, Tag> dbTags = tagRepository.findTagsByUserIdAndTagNameIn(userId, newTags)
                 .stream()
