@@ -3,8 +3,8 @@ package com.poogle.phog.web.note.controller;
 import com.poogle.phog.domain.Note;
 import com.poogle.phog.domain.Photo;
 import com.poogle.phog.exception.AuthorizationException;
-import com.poogle.phog.exception.VerificationException;
 import com.poogle.phog.exception.NotFoundException;
+import com.poogle.phog.exception.VerificationException;
 import com.poogle.phog.service.NoteService;
 import com.poogle.phog.service.S3Service;
 import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
@@ -91,8 +91,8 @@ public class NoteController {
 
     @DeleteMapping("/{note-id}")
     public void delete(@PathVariable(name = "note-id") Long noteId,
-                       HttpServletResponse response) {
-        noteService.delete(noteId);
+                       @RequestAttribute("id") Long userId, HttpServletResponse response) {
+        noteService.delete(noteId, userId);
         response.setStatus(HttpStatus.OK.value());
     }
 

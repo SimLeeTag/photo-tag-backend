@@ -164,7 +164,11 @@ public class NoteService {
         checkRemainTag(userId, note, newTags, dbTags);
     }
 
-    public void delete(Long noteId) {
+    public void delete(Long noteId, Long userId) {
+        Note note = noteRepository.findById(noteId).orElseThrow(() -> new NotFoundException("Note doesn't exist"));
+        if (!note.getUser().getId().equals(userId)) {
+            throw AuthorizationException.accessWrong();
+        }
         noteRepository.deleteById(noteId);
     }
 }
