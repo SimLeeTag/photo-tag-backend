@@ -11,7 +11,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<String> handleAuthorizationException(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body("invalid token");
+                .body(e.getMessage());
     }
 
     @ExceptionHandler(VerificationException.class)
@@ -19,4 +19,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(e.getMessage());
     }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFoundException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
 }
