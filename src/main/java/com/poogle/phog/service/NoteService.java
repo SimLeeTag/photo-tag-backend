@@ -1,12 +1,12 @@
 package com.poogle.phog.service;
 
 import com.poogle.phog.domain.*;
+import com.poogle.phog.exception.AuthorizationException;
+import com.poogle.phog.exception.NotFoundException;
 import com.poogle.phog.exception.VerificationException;
 import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
 import com.poogle.phog.web.note.dto.PostNoteRequestDTO;
-import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,8 +37,9 @@ public class NoteService {
     public void save(PostNoteRequestDTO noteRequestDTO, Long userId) {
         LocalDateTime now = LocalDateTime.now();
 
-        if (noteRequestDTO.getRawMemo() == null || noteRequestDTO.getPhotos() == null) {
-            throw new VerificationException("Note can't be blank");
+        if (noteRequestDTO.getRawMemo() == null || noteRequestDTO.getRawMemo().isEmpty() ||
+                noteRequestDTO.getPhotos() == null || noteRequestDTO.getPhotos().isEmpty()) {
+            throw new VerificationException("Note and Photos can't be blank");
         }
 
         Note note = Note.builder()
@@ -50,6 +51,9 @@ public class NoteService {
         note.addPhotos(noteRequestDTO.getPhotos());
 
         List<String> newTags = note.captureTags(note);
+        if (newTags.isEmpty()) {
+            throw new VerificationException("There should be at least one tag");
+        }
         log.debug("[*] newTags : {}", newTags.toString());
         Map<String, Tag> dbTags = tagRepository.findTagsByUserIdAndTagNameIn(userId, newTags)
                 .stream()
@@ -80,13 +84,16 @@ public class NoteService {
         noteRepository.save(note);
     }
 
-    public Note findNote(Long noteId) throws NotFound {
-        return noteRepository.findById(noteId).orElseThrow(NotFound::new);
+    public Note findNote(Long noteId) throws NotFoundException {
+        return noteRepository.findById(noteId).orElseThrow(() -> new NotFoundException("Note doesn't exist"));
     }
 
-    public List<GetNoteResponseDTO> findAllNotes(Long userId, String word) throws NotFound {
+    public List<GetNoteResponseDTO> findAllNotes(Long userId, String word) throws NotFoundException {
         List<GetNoteResponseDTO> searchedNotes = new ArrayList<>();
         User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw AuthorizationException.accessWrong();
+        }
         List<Note> notes = noteRepository.findNotesByUserAndRawMemoContainsOrderByCreatedDesc(user, word);
         for (Note note : notes) {
             Long noteId = note.getId();
@@ -103,9 +110,12 @@ public class NoteService {
 
     }
 
-    public List<String> findPhotos(Long noteId) throws NotFound {
+    public List<String> findPhotos(Long noteId) throws NotFoundException {
         Note note = findNote(noteId);
         List<Photo> photos = note.getPhotos();
+        if (photos.isEmpty()) {
+            throw new NotFoundException("Photos don't exist");
+        }
         List<String> photoUrls = new ArrayList<>();
         for (Photo photo : photos) {
             photoUrls.add(photo.getUrl());
@@ -116,12 +126,16 @@ public class NoteService {
 
     public List<String> findTags(Long noteId) {
         List<Tag> tags = noteTagService.findTagsByNoteId(noteId);
-        List<String> tagNames = new ArrayList<>();
-        for (Tag tag : tags) {
-            tagNames.add(tag.getTagName());
+        if (tags.isEmpty()) {
+            throw new NotFoundException("Tags don't exist");
+        } else {
+            List<String> tagNames = new ArrayList<>();
+            for (Tag tag : tags) {
+                tagNames.add(tag.getTagName());
+            }
+            log.debug("[*] tagList : {}", tagNames);
+            return tagNames;
         }
-        log.debug("[*] tagList : {}", tagNames);
-        return tagNames;
     }
 
     public void edit(Long userId, Long noteId, PostNoteRequestDTO noteDTO) throws NotFoundException {
@@ -129,15 +143,18 @@ public class NoteService {
         if (noteDTO.getRawMemo() == null) {
             throw new VerificationException("Note can't be blank");
         }
-
         Note note = noteRepository.findById(noteId).orElseThrow(() -> new NotFoundException("Note doesn't exist"));
-
+        if (!note.getUser().getId().equals(userId)) {
+            throw AuthorizationException.accessWrong();
+        }
         note.setCreated(now);
         note.setRawMemo(noteDTO.getRawMemo());
-
         noteTagService.deleteByNoteId(noteId);
 
         List<String> newTags = note.captureTags(note);
+        if (newTags.isEmpty()) {
+            throw new VerificationException("There should be at least one tag");
+        }
 
         Map<String, Tag> dbTags = tagRepository.findTagsByUserIdAndTagNameIn(userId, newTags)
                 .stream()
@@ -147,7 +164,11 @@ public class NoteService {
         checkRemainTag(userId, note, newTags, dbTags);
     }
 
-    public void delete(Long noteId) {
+    public void delete(Long noteId, Long userId) {
+        Note note = noteRepository.findById(noteId).orElseThrow(() -> new NotFoundException("Note doesn't exist"));
+        if (!note.getUser().getId().equals(userId)) {
+            throw AuthorizationException.accessWrong();
+        }
         noteRepository.deleteById(noteId);
     }
 }

@@ -10,6 +10,10 @@ public class AuthorizationException extends RuntimeException {
         return new AuthorizationException("Token doesn't exist");
     }
 
+    public static AuthorizationException accessWrong() {
+        return new AuthorizationException("Not allowed access");
+    }
+
     public AuthorizationException(String message) {
         super(message);
     }

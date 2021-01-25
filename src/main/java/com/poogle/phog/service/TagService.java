@@ -1,12 +1,13 @@
 package com.poogle.phog.service;
 
 import com.poogle.phog.domain.*;
+import com.poogle.phog.exception.AuthorizationException;
+import com.poogle.phog.exception.NotFoundException;
 import com.poogle.phog.web.note.dto.GetNoteResponseDTO;
 import com.poogle.phog.web.tag.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,8 +76,11 @@ public class TagService {
                 .build();
     }
 
-    public void changeActiveStatus(Long tagId, PatchTagRequestDTO request) throws NotFound {
-        Tag tag = tagRepository.findById(tagId).orElseThrow(NotFound::new);
+    public void changeActiveStatus(Long userId, Long tagId, PatchTagRequestDTO request) {
+        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new NotFoundException("Tag doesn't exist"));
+        if (!tag.getUserId().equals(userId)) {
+            throw AuthorizationException.accessWrong();
+        }
         tag.setActivated(request.getActivated());
         tagRepository.save(tag);
     }
@@ -98,7 +102,7 @@ public class TagService {
         return getCategorizedTags;
     }
 
-    public List<GetNoteResponseDTO> getTaggedNoteList(List<Long> tags) throws NotFound {
+    public List<GetNoteResponseDTO> getTaggedNoteList(List<Long> tags) {
         List<Long> taggedNoteIds = new ArrayList<>();
         for (Long tagId : tags) {
             List<Long> noteIdList = noteTagRepository.findNoteIdsByTagId(tagId);
