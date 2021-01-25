@@ -7,7 +7,6 @@ import com.poogle.phog.web.tag.dto.GetTagListResponseDTO;
 import com.poogle.phog.web.tag.dto.GetTagSuggestionDTO;
 import com.poogle.phog.web.tag.dto.PatchTagRequestDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 @Slf4j
@@ -39,7 +37,7 @@ public class TagController {
     public void activate(@PathVariable(name = "tag-id") Long tagId,
                          @RequestBody PatchTagRequestDTO request,
                          @RequestAttribute("id") Long userId,
-                         HttpServletResponse response) throws NotFound {
+                         HttpServletResponse response) {
         tagService.changeActiveStatus(userId, tagId, request);
         response.setStatus(HttpStatus.OK.value());
     }
@@ -52,12 +50,12 @@ public class TagController {
 
     @GetMapping("")
     public List<GetNoteResponseDTO> taggedNotes(
-            @RequestParam(value = "tag", required = true) List<Long> tags) throws NotFound {
+            @RequestParam(value = "tag") List<Long> tags) {
         return tagService.getTaggedNoteList(tags);
     }
 
     @GetMapping(value = "/suggestion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public GetTagSuggestionDTO suggest(@RequestPart("file") MultipartFile multipartFile) throws IOException, URISyntaxException {
+    public GetTagSuggestionDTO suggest(@RequestPart("file") MultipartFile multipartFile) throws IOException {
         return tagService.suggestTags(multipartFile);
     }
 }
